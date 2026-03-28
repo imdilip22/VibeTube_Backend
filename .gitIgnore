@@ -1,0 +1,10 @@
+node_modules
+build
+.env
+.vscode
+.serverless
+.webpack
+_warmup
+tsc_errors.txt
+tsc_out.txt
+.md
