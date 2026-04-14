@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { register, login, refreshTokens, logout, getMe } from "../../service/auth/auth.service";
+import { googleSignIn } from "../../service/auth/google.auth.service";
 import { AuthenticatedRequest } from "../../types/auth.types";
 
 const COOKIE_OPTIONS = {
@@ -122,3 +123,26 @@ export const logoutController = async (
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+
+export const googleSignInController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { idToken: accessToken } = req.body;   // frontend sends field as "idToken"
+    if (!accessToken) {
+      return res.status(400).json({ success: false, message: "Google access token is required." });
+    }
+    const result = await googleSignIn(accessToken);
+
+    if (result.success && result.data?.tokens) {
+      setAuthCookies(res, result.data.tokens.accessToken, result.data.tokens.refreshToken);
+    }
+
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    console.log("auth.controller.googleSignInController error", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+

@@ -1,3 +1,4 @@
+
 export const TABLE_NAMES = {
   USERS: "users",
   REFRESH_TOKENS: "refresh_tokens",
@@ -5,6 +6,7 @@ export const TABLE_NAMES = {
   SUBSCRIPTIONS: "subscriptions",
   VIDEO_LIKES: "video_likes",
   COMMENTS: "comments",
+  WATCH_LATER: "watch_later",
 } as const;
 
 // ─── Upload ───────────────────────────────────────────────────────────────────

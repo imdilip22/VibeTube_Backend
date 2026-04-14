@@ -6,7 +6,7 @@ import {
   getAllVideosController,
   getVideoStatusController,
 } from "../../controller/video/video.controller";
-import { getLikeInfoController, toggleLikeController } from "../../controller/like/like.controller";
+import { getLikeInfoController, toggleLikeController, getLikedVideosListController } from "../../controller/like/like.controller";
 import {
   getCommentsController,
   addCommentController,
@@ -29,6 +29,7 @@ videoRouter.post(
 
 // ── List / status ─────────────────────────────────────────────────────────────
 videoRouter.get("/", getAllVideosController);
+videoRouter.get("/liked", authenticate, getLikedVideosListController);
 videoRouter.get("/status/:id", getVideoStatusController);
 
 // ── Likes ─────────────────────────────────────────────────────────────────────

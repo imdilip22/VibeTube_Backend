@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { UniqueConstraintError } from "sequelize";
-import { VideoLike } from "../../models";
+import { VideoLike, Video, User } from "../../models";
 import type { ServiceResult } from "../../types/common.types";
 
 export type LikeInfo = {
@@ -53,6 +53,46 @@ export const toggleLikeService = async (videoId: string, userEmail: string): Pro
       success: false,
       data: null,
       message: "Failed to toggle like.",
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+    };
+  }
+};
+
+export const getLikedVideosListService = async (userEmail: string): Promise<ServiceResult<any>> => {
+  try {
+    const list = await VideoLike.findAll({
+      where: { userEmail },
+      include: [
+        {
+          model: Video,
+          as: "video",
+          include: [
+            {
+              model: User,
+              as: "uploader",
+              attributes: ["name", "email"],
+            },
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Flatten to return videos directly
+    const videos = list.map((entry: any) => entry.video).filter(Boolean);
+
+    return {
+      success: true,
+      data: videos,
+      message: "Liked videos list retrieved.",
+      statusCode: StatusCodes.OK,
+    };
+  } catch (error) {
+    console.log("like.service.getLikedVideosListService error", error);
+    return {
+      success: false,
+      data: null,
+      message: "Failed to retrieve liked videos list.",
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
     };
   }
