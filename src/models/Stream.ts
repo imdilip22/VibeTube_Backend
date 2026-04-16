@@ -2,41 +2,36 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 import { TABLE_NAMES } from "../constants/constant";
 
-export class Video extends Model {
+export class Stream extends Model {
   declare id: string;
+  declare streamKey: string;
   declare title: string;
-  declare originalName: string;
-  declare status: "processing" | "done" | "error";
-  declare createdBy: string;
+  declare creatorEmail: string;
+  declare isLive: boolean;
+  declare viewerCount: number;
   declare thumbnailPath: string | null;
-  declare error: string | null;
-  declare isLiveArchive: boolean;
-  declare streamKey: string | null;
+  declare archivedVideoId: string | null;
   declare createdAt: Date;
   declare updatedAt: Date;
 }
 
-Video.init(
+Stream.init(
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    streamKey: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    originalName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    status: {
-      type: DataTypes.ENUM("processing", "done", "error"),
-      allowNull: false,
-      defaultValue: "processing",
-    },
-    createdBy: {
+    creatorEmail: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
@@ -45,32 +40,32 @@ Video.init(
       },
       onDelete: "CASCADE",
     },
+    isLive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    viewerCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     thumbnailPath: {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: null,
     },
-    error: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      defaultValue: null,
-    },
-    // True when this Video record was automatically created from an ended live stream
-    isLiveArchive: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    // The stream key this archive was created from (null for regular uploads)
-    streamKey: {
-      type: DataTypes.STRING,
+    // Pre-created Video record ID — allows social features (likes/comments/watch-later)
+    // to work during the live stream and seamlessly carry over to the archive.
+    archivedVideoId: {
+      type: DataTypes.UUID,
       allowNull: true,
       defaultValue: null,
     },
   },
   {
     sequelize,
-    tableName: TABLE_NAMES.VIDEOS,
+    tableName: TABLE_NAMES.STREAMS,
     timestamps: true,
   }
 );

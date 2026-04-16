@@ -9,3 +9,4 @@ tsc_errors.txt
 tsc_out.txt
 .md
 hls-output
+live-hls

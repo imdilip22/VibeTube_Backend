@@ -11,6 +11,9 @@ import { connectDB } from "./src/config/database";
 import { errorHandler } from "./src/middleware/errorHandler.middleware";
 // Load models so associations are registered at startup
 import "./src/models/index";
+import http from "http";
+import { setupLiveSocket } from "./src/socket/liveStream";
+import { nms } from "./src/nms/index";
 
 const app = express();
 const cloudFrontURL = process.env.CLOUDFRONT_URL;
@@ -18,7 +21,7 @@ const cloudFrontURL = process.env.CLOUDFRONT_URL;
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origin: ["http://localhost:5173"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
@@ -29,6 +32,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // ─── Serve HLS output as static files for video playback ──────────────────────
 app.use("/hls-output", express.static(path.join(process.cwd(), "hls-output")));
+
+// ─── Serve live HLS segments produced by Node Media Server ────────────────────
+app.use("/live-hls", express.static(path.join(process.cwd(), "live-hls")));
 
 app.use("/health", (req: Request, res: Response) => {
   res.status(200).json({ message: "OK" });
@@ -42,8 +48,20 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(process.env.PORT ?? 3000, () => {
-      console.log(`Server is running on port http://localhost:${process.env.PORT ?? 3000}`);
+
+    // Wrap Express in a plain Node HTTP server so Socket.io can share the port
+    const httpServer = http.createServer(app);
+
+    // Attach Socket.io (live streaming pipeline)
+    setupLiveSocket(httpServer);
+
+    // Start Node Media Server (RTMP on 1935, HLS served on 8888)
+    nms.run();
+
+    httpServer.listen(3000, () => {
+      console.log(`Server is running on port http://localhost:3000`);
+      console.log(`RTMP ingestion: rtmp://localhost:1935/live/<streamKey>`);
+      console.log(`Live HLS:       http://localhost:3000/live-hls/live/<streamKey>/index.m3u8`);
     });
   } catch (error) {
     console.log("startServer failed to start", error);

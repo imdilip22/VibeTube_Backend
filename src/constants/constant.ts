@@ -7,6 +7,7 @@ export const TABLE_NAMES = {
   VIDEO_LIKES: "video_likes",
   COMMENTS: "comments",
   WATCH_LATER: "watch_later",
+  STREAMS: "streams",
 } as const;
 
 // ─── Upload ───────────────────────────────────────────────────────────────────
