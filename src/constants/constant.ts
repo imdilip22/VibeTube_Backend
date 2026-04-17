@@ -7,6 +7,7 @@ export const TABLE_NAMES = {
   VIDEO_LIKES: "video_likes",
   COMMENTS: "comments",
   WATCH_LATER: "watch_later",
+  WATCH_HISTORY: "watch_history",
   STREAMS: "streams",
 } as const;
 

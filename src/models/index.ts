@@ -5,6 +5,7 @@ import { Subscription } from "./Subscription";
 import { VideoLike } from "./VideoLike";
 import { Comment } from "./Comment";
 import { WatchLater } from "./WatchLater";
+import { WatchHistory } from "./WatchHistory";
 import { Stream } from "./Stream";
 
 // ─── User ↔ RefreshToken ──────────────────────────────────────────────────────
@@ -91,6 +92,18 @@ WatchLater.belongsTo(User, { foreignKey: "userEmail", targetKey: "email", as: "u
 Video.hasMany(WatchLater, { foreignKey: "videoId", as: "watchLaterEntries", onDelete: "CASCADE" });
 WatchLater.belongsTo(Video, { foreignKey: "videoId", as: "video" });
 
+// ─── WatchHistory associations ────────────────────────────────────────────────
+User.hasMany(WatchHistory, {
+  foreignKey: "userEmail",
+  sourceKey: "email",
+  as: "watchHistory",
+  onDelete: "CASCADE",
+});
+WatchHistory.belongsTo(User, { foreignKey: "userEmail", targetKey: "email", as: "user" });
+
+Video.hasMany(WatchHistory, { foreignKey: "videoId", as: "watchHistoryEntries", onDelete: "CASCADE" });
+WatchHistory.belongsTo(Video, { foreignKey: "videoId", as: "video" });
+
 // ─── Stream associations ──────────────────────────────────────────────────────
 User.hasMany(Stream, {
   foreignKey: "creatorEmail",
@@ -104,4 +117,4 @@ Stream.belongsTo(User, {
   as: "creator",
 });
 
-export { User, RefreshToken, Video, Subscription, VideoLike, Comment, WatchLater, Stream };
+export { User, RefreshToken, Video, Subscription, VideoLike, Comment, WatchLater, WatchHistory, Stream };
