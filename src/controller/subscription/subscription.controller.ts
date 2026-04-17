@@ -7,12 +7,14 @@ import {
   unsubscribe,
   getSubscriptionsFeed,
   getSubscribedChannels,
+  type FeedSortOrder,
 } from "../../service/subscription/subscription.service";
 
 // ─── GET /api/v1/subscriptions/feed ──────────────────────────────────────────
 export const getSubscriptionsFeedController = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const result = await getSubscriptionsFeed(req.user!.email);
+    const sort = (req.query.sort as FeedSortOrder) ?? "latest";
+    const result = await getSubscriptionsFeed(req.user!.email, sort);
     res.status(result.statusCode).json(result);
   } catch (error) {
     console.log("subscription.controller.getSubscriptionsFeedController error", error);

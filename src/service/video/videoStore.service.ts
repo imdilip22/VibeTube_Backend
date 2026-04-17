@@ -73,12 +73,24 @@ export const getVideoById = async (videoId: string): Promise<ServiceResult<Video
 };
 
 // ─── Get all (optionally filtered by creator) ─────────────────────────────────
-export const getAllVideos = async (createdBy?: string): Promise<ServiceResult<VideoRecord[]>> => {
+export type VideoSortOrder = "latest" | "oldest" | "popular";
+
+export const getAllVideos = async (
+  createdBy?: string,
+  sort: VideoSortOrder = "latest"
+): Promise<ServiceResult<VideoRecord[]>> => {
   try {
+    const order: [string, string][] =
+      sort === "oldest"
+        ? [["createdAt", "ASC"]]
+        : sort === "popular"
+        ? [["views", "DESC"]]
+        : [["createdAt", "DESC"]];
+
     const videos = await Video.findAll({
       where: createdBy ? { createdBy } : undefined,
       include: [{ model: User, as: "uploader", attributes: ["name"] }],
-      order: [["createdAt", "DESC"]],
+      order,
     });
 
     return {

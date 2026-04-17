@@ -64,8 +64,8 @@ export const uploadVideoService = async (
 };
 
 // ─── Get all (optionally filtered by channel) ─────────────────────────────────
-export const getAllVideosService = async (createdBy?: string): Promise<ServiceResult<VideoRecord[]>> => {
-  return getAllVideos(createdBy);
+export const getAllVideosService = async (createdBy?: string, sort?: string): Promise<ServiceResult<VideoRecord[]>> => {
+  return getAllVideos(createdBy, (sort as any) ?? "latest");
 };
 
 // ─── Get status ───────────────────────────────────────────────────────────────

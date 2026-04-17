@@ -65,7 +65,8 @@ export const uploadVideoController = async (req: AuthenticatedRequest, res: Resp
 export const getAllVideosController = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const createdBy = (req.query.createdBy as string) || undefined;
-    const result = await getAllVideosService(createdBy);
+    const sort = (req.query.sort as string) || "latest";
+    const result = await getAllVideosService(createdBy, sort);
     res.status(result.statusCode).json(result);
   } catch (error) {
     console.log("video.controller.getAllVideosController error", error);

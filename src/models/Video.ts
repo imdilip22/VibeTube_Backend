@@ -10,6 +10,7 @@ export class Video extends Model {
   declare createdBy: string;
   declare thumbnailPath: string | null;
   declare error: string | null;
+  declare views: number;
   declare isLiveArchive: boolean;
   declare streamKey: string | null;
   declare createdAt: Date;
@@ -54,6 +55,11 @@ Video.init(
       type: DataTypes.TEXT,
       allowNull: true,
       defaultValue: null,
+    },
+    views: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
     // True when this Video record was automatically created from an ended live stream
     isLiveArchive: {

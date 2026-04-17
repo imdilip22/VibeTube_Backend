@@ -97,9 +97,13 @@ export const unsubscribe = async (
 };
 
 // ─── Subscriptions feed ───────────────────────────────────────────────────────
-// Videos from all channels the user subscribes to, newest first.
+// Videos from all channels the user subscribes to.
+// sort: "latest" (default) | "oldest" | "popular"
+export type FeedSortOrder = "latest" | "oldest" | "popular";
+
 export const getSubscriptionsFeed = async (
-  subscriberEmail: string
+  subscriberEmail: string,
+  sort: FeedSortOrder = "latest"
 ): Promise<ServiceResult<VideoRecord[]>> => {
   try {
     const subscriptions = await Subscription.findAll({
@@ -118,10 +122,18 @@ export const getSubscriptionsFeed = async (
 
     const channelEmails = subscriptions.map((s) => s.channelEmail);
 
+    // Build order clause based on sort param
+    const order: [string, string][] =
+      sort === "oldest"
+        ? [["createdAt", "ASC"]]
+        : sort === "popular"
+        ? [["views", "DESC"]]
+        : [["createdAt", "DESC"]]; // default: latest
+
     const videos = await Video.findAll({
       where: { createdBy: { [Op.in]: channelEmails } },
       include: [{ model: User, as: "uploader", attributes: ["name"] }],
-      order: [["createdAt", "DESC"]],
+      order,
     });
 
     return {
