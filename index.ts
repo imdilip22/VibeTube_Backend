@@ -13,7 +13,6 @@ import { errorHandler } from "./src/middleware/errorHandler.middleware";
 import "./src/models/index";
 import http from "http";
 import { setupLiveSocket } from "./src/socket/liveStream";
-import { nms } from "./src/nms/index";
 
 const app = express();
 const cloudFrontURL = process.env.CLOUDFRONT_URL;
@@ -56,12 +55,11 @@ const startServer = async () => {
     setupLiveSocket(httpServer);
 
     // Start Node Media Server (RTMP on 1935, HLS served on 8888)
-    nms.run();
+    // nms.run();
 
     httpServer.listen(3000, () => {
       console.log(`Server is running on port http://localhost:3000`);
-      console.log(`RTMP ingestion: rtmp://localhost:1935/live/<streamKey>`);
-      console.log(`Live HLS:       http://localhost:3000/live-hls/live/<streamKey>/index.m3u8`);
+      // console.log(`RTMP ingestion: rtmp://localhost:1935/live/<streamKey>`);
     });
   } catch (error) {
     console.log("startServer failed to start", error);

@@ -5,6 +5,7 @@ import {
   uploadVideoController,
   getAllVideosController,
   getVideoStatusController,
+  deleteVideoController,
 } from "../../controller/video/video.controller";
 import { getLikeInfoController, toggleLikeController, getLikedVideosListController } from "../../controller/like/like.controller";
 import {
@@ -37,7 +38,7 @@ videoRouter.get("/status/:id", getVideoStatusController);
 // POST /api/v1/videos/:videoId/likes  — toggle like/unlike
 videoRouter.get("/:videoId/likes", authenticate, getLikeInfoController);
 videoRouter.post("/:videoId/likes", authenticate, toggleLikeController);
-
+videoRouter.delete("/:videoId", authenticate, deleteVideoController);
 // ── Comments ──────────────────────────────────────────────────────────────────
 // GET    /api/v1/videos/:videoId/comments              — list comments
 // POST   /api/v1/videos/:videoId/comments              — add comment

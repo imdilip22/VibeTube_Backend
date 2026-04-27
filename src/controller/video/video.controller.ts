@@ -7,6 +7,7 @@ import {
   getAllVideosService,
   getVideoStatusService,
 } from "../../service/video/video.service";
+import { deleteVideo } from "../../service/video/videoStore.service";
 
 // ─── POST /api/v1/videos/upload ───────────────────────────────────────────────
 export const uploadVideoController = async (req: AuthenticatedRequest, res: Response) => {
@@ -90,3 +91,17 @@ export const getVideoStatusController = async (req: AuthenticatedRequest, res: R
     });
   }
 };
+// ─── DELETE /api/v1/videos/:videoId ──────────────────────────────────────────
+export const deleteVideoController = async (req: AuthenticatedRequest, res: Response) => {
+  const videoId = req.params.videoId as string;
+  try {
+    const result = await deleteVideo(videoId, req.user!.email);
+    res.status(result.statusCode).json(result);
+  } catch (error) {
+    console.log("video.controller.deleteVideoController error", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+}

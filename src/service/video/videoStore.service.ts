@@ -1,7 +1,10 @@
+import fs from "fs";
+import path from "path";
 import { StatusCodes } from "http-status-codes";
 import { ServiceResult } from "../../types/common.types";
 import { VideoRecord, VideoStatus } from "../../types/video.types";
 import { Video, User } from "../../models";
+import config from "../../config/app.config";
 
 // ─── Create ───────────────────────────────────────────────────────────────────
 export const createVideo = async (
@@ -84,8 +87,8 @@ export const getAllVideos = async (
       sort === "oldest"
         ? [["createdAt", "ASC"]]
         : sort === "popular"
-        ? [["views", "DESC"]]
-        : [["createdAt", "DESC"]];
+          ? [["views", "DESC"]]
+          : [["createdAt", "DESC"]];
 
     const videos = await Video.findAll({
       where: createdBy ? { createdBy } : undefined,
@@ -120,5 +123,64 @@ export const updateVideoStatus = async (
     await Video.update({ status, error }, { where: { id: videoId } });
   } catch (err) {
     console.log("videoStore.updateVideoStatus error", err);
+  }
+};
+// ─── Delete ───────────────────────────────────────────────────────────────────
+export const deleteVideo = async (id: string, email: string): Promise<ServiceResult<null>> => {
+  try {
+    const video = await Video.findByPk(id);
+
+    if (!video) {
+      return {
+        success: false,
+        data: null,
+        message: "Video not found.",
+        statusCode: StatusCodes.NOT_FOUND,
+      };
+    }
+
+    if (video.createdBy !== email) {
+      return {
+        success: false,
+        data: null,
+        message: "You are not authorized to delete this video.",
+        statusCode: StatusCodes.FORBIDDEN,
+      };
+    }
+
+    await video.destroy();
+
+    // ── Clean up files ────────────────────────────────────────────────────────
+    // 1. Remove the entire HLS output directory (segments + thumbnail + playlist)
+    const hlsDir = path.join(config.hlsOutputDir, id);
+    if (fs.existsSync(hlsDir)) {
+      fs.rmSync(hlsDir, { recursive: true, force: true });
+    }
+
+    // 2. Remove any leftover raw upload file (may still exist if transcoding failed)
+    const uploadsDir = config.uploadsDir;
+    const uploadExts = [".mp4", ".mkv", ".avi", ".mov", ".webm"];
+    for (const ext of uploadExts) {
+      const uploadFile = path.join(uploadsDir, `${id}${ext}`);
+      if (fs.existsSync(uploadFile)) {
+        fs.rmSync(uploadFile, { force: true });
+        break;
+      }
+    }
+
+    return {
+      success: true,
+      data: null,
+      message: "Video deleted successfully.",
+      statusCode: StatusCodes.OK,
+    };
+  } catch (error) {
+    console.log("videoStore.deleteVideo error", error);
+    return {
+      success: false,
+      data: null,
+      message: "Failed to delete video.",
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+    };
   }
 };
