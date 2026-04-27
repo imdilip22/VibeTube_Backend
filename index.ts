@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import { Request, Response } from "express";
 import { connectDB } from "./src/config/database";
 import { errorHandler } from "./src/middleware/errorHandler.middleware";
+import passport from "./src/config/passport";
 // Load models so associations are registered at startup
 import "./src/models/index";
 import http from "http";
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // ─── Serve HLS output as static files for video playback ──────────────────────
 app.use("/hls-output", express.static(path.join(process.cwd(), "hls-output")));
@@ -59,7 +61,6 @@ const startServer = async () => {
 
     httpServer.listen(3000, () => {
       console.log(`Server is running on port http://localhost:3000`);
-      // console.log(`RTMP ingestion: rtmp://localhost:1935/live/<streamKey>`);
     });
   } catch (error) {
     console.log("startServer failed to start", error);

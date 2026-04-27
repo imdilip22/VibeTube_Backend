@@ -3,7 +3,6 @@ import multer from "multer";
 import path from "path";
 import config from "../../config/app.config";
 import { ALLOWED_IMAGE_FORMATS } from "../../constants/constant";
-import { authenticate } from "../../middleware/authenticate.middleware";
 import {
   createStreamController,
   getActiveStreamsController,
@@ -34,22 +33,8 @@ const thumbnailUpload = multer({
 
 export const liveRouter = Router();
 
-// List all active (live) streams — public
 liveRouter.get("/", getActiveStreamsController);
-
-// My streams — authenticated
-liveRouter.get("/my", authenticate, getMyStreamsController);
-
-// Create a new stream (multipart: title + optional thumbnail image)
-liveRouter.post(
-  "/",
-  authenticate,
-  thumbnailUpload.fields([{ name: "thumbnail", maxCount: 1 }]),
-  createStreamController
-);
-
-// Get info about a specific stream by key
+liveRouter.get("/my", getMyStreamsController);
+liveRouter.post("/", thumbnailUpload.fields([{ name: "thumbnail", maxCount: 1 }]), createStreamController);
 liveRouter.get("/:streamKey", getStreamController);
-
-// Mark a stream ended via REST
-liveRouter.patch("/:streamKey/end", authenticate, endStreamController);
+liveRouter.patch("/:streamKey/end", endStreamController);

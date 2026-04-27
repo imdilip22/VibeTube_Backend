@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/authenticate.middleware";
 import {
   getSubscriptionInfoController,
   subscribeController,
@@ -10,24 +9,11 @@ import {
 
 export const subscriptionRouter = Router();
 
-// All subscription routes require authentication
-subscriptionRouter.use(authenticate);
-
-// ── Static paths first — must come before /:channelEmail ─────────────────────
-
-// GET  /api/v1/subscriptions/feed     — video feed from subscribed channels
+// Static paths first — must come before /:channelEmail
 subscriptionRouter.get("/feed", getSubscriptionsFeedController);
-
-// GET  /api/v1/subscriptions/channels — list of channels the user follows
 subscriptionRouter.get("/channels", getSubscribedChannelsController);
 
-// ── Parameterised routes ──────────────────────────────────────────────────────
-
-// GET    /api/v1/subscriptions/:channelEmail  — subscriber count + isSubscribed
+// Parameterised routes
 subscriptionRouter.get("/:channelEmail", getSubscriptionInfoController);
-
-// POST   /api/v1/subscriptions/:channelEmail  — subscribe
 subscriptionRouter.post("/:channelEmail", subscribeController);
-
-// DELETE /api/v1/subscriptions/:channelEmail  — unsubscribe
 subscriptionRouter.delete("/:channelEmail", unsubscribeController);

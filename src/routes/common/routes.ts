@@ -6,10 +6,15 @@ import { watchLaterRouter } from "../watchlater/routes";
 import { watchHistoryRouter } from "../watchhistory/routes";
 import { channelsRouter } from "../channels/routes";
 import { liveRouter } from "../live/routes";
+import { authMiddleware } from "../../middleware/authenticate.middleware";
 
 export const router = Router();
 
+// ── Public auth routes (register, login, refresh, Google OAuth) ───────────────
 router.use("/auth", authRouter);
+
+// ── All other routes are protected globally ───────────────────────────────────
+router.use(authMiddleware);
 router.use("/videos", videoRouter);
 router.use("/subscriptions", subscriptionRouter);
 router.use("/watch-later", watchLaterRouter);

@@ -2,18 +2,23 @@ import { Router } from "express";
 import {
   registerController,
   loginController,
-  meController,
   refreshController,
   logoutController,
-  googleSignInController,
+  googleAuthController,
+  googleCallbackController,
 } from "../../controller/auth/auth.controller";
-import { authenticate } from "../../middleware/authenticate.middleware";
+import { authMiddleware } from "../../middleware/authenticate.middleware";
 
 export const authRouter = Router();
 
+// ── Public ────────────────────────────────────────────────────────────────────
 authRouter.post("/register", registerController);
 authRouter.post("/login", loginController);
-authRouter.post("/google", googleSignInController);
-authRouter.get("/me", authenticate, meController);
 authRouter.post("/refresh", refreshController);
-authRouter.post("/logout", logoutController);
+
+// ── Google OAuth2 (authorization code flow) ───────────────────────────────────
+authRouter.get("/google", googleAuthController);
+authRouter.get("/google/callback", googleCallbackController);
+
+// ── Protected ─────────────────────────────────────────────────────────────────
+authRouter.post("/logout", authMiddleware, logoutController);

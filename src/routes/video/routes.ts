@@ -1,6 +1,5 @@
 import { Router } from "express";
 import upload, { generateVideoId } from "../../middleware/upload.middleware";
-import { authenticate } from "../../middleware/authenticate.middleware";
 import {
   uploadVideoController,
   getAllVideosController,
@@ -19,7 +18,6 @@ export const videoRouter = Router();
 // ── Upload ────────────────────────────────────────────────────────────────────
 videoRouter.post(
   "/upload",
-  authenticate,
   generateVideoId,
   upload.fields([
     { name: "video", maxCount: 1 },
@@ -30,19 +28,15 @@ videoRouter.post(
 
 // ── List / status ─────────────────────────────────────────────────────────────
 videoRouter.get("/", getAllVideosController);
-videoRouter.get("/liked", authenticate, getLikedVideosListController);
+videoRouter.get("/liked", getLikedVideosListController);
 videoRouter.get("/status/:id", getVideoStatusController);
 
 // ── Likes ─────────────────────────────────────────────────────────────────────
-// GET  /api/v1/videos/:videoId/likes  — count + isLiked
-// POST /api/v1/videos/:videoId/likes  — toggle like/unlike
-videoRouter.get("/:videoId/likes", authenticate, getLikeInfoController);
-videoRouter.post("/:videoId/likes", authenticate, toggleLikeController);
-videoRouter.delete("/:videoId", authenticate, deleteVideoController);
+videoRouter.get("/:videoId/likes", getLikeInfoController);
+videoRouter.post("/:videoId/likes", toggleLikeController);
+videoRouter.delete("/:videoId", deleteVideoController);
+
 // ── Comments ──────────────────────────────────────────────────────────────────
-// GET    /api/v1/videos/:videoId/comments              — list comments
-// POST   /api/v1/videos/:videoId/comments              — add comment
-// DELETE /api/v1/videos/:videoId/comments/:commentId   — delete own comment
-videoRouter.get("/:videoId/comments", authenticate, getCommentsController);
-videoRouter.post("/:videoId/comments", authenticate, addCommentController);
-videoRouter.delete("/:videoId/comments/:commentId", authenticate, deleteCommentController);
+videoRouter.get("/:videoId/comments", getCommentsController);
+videoRouter.post("/:videoId/comments", addCommentController);
+videoRouter.delete("/:videoId/comments/:commentId", deleteCommentController);
