@@ -7,6 +7,8 @@ export class User extends Model {
   declare name: string;
   declare password: string | null;
   declare googleId: string | null;
+  declare avatar: string | null;      // filename stored in uploads/profiles/
+  declare coverPhoto: string | null;  // filename stored in uploads/covers/
   declare createdAt: Date;
   declare updatedAt: Date;
 }
@@ -31,6 +33,14 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
+    },
+    avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    coverPhoto: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

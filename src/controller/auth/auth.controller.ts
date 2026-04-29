@@ -42,7 +42,13 @@ export const registerController = async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: "All fields are required." });
       return;
     }
-    const result = await register(email, name, password);
+
+    // Extract optional uploaded files (multipart/form-data)
+    const files = req.files as { avatar?: Express.Multer.File[]; coverPhoto?: Express.Multer.File[] } | undefined;
+    const avatarFilename = files?.avatar?.[0]?.filename;
+    const coverFilename = files?.coverPhoto?.[0]?.filename;
+
+    const result = await register(email, name, password, avatarFilename, coverFilename);
     res.status(result.statusCode).json(result);
   } catch (error) {
     console.log("auth.controller.registerController error", error);

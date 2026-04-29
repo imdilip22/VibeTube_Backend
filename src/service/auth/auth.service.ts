@@ -9,7 +9,13 @@ import {
 } from "../../utils/jwt.utils";
 
 // ─── Register ─────────────────────────────────────────────────────────────────
-export const register = async (email: string, name: string, password: string) => {
+export const register = async (
+  email: string,
+  name: string,
+  password: string,
+  avatarFilename?: string,
+  coverFilename?: string
+) => {
   try {
     const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
     if (existingUser) {
@@ -22,7 +28,13 @@ export const register = async (email: string, name: string, password: string) =>
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({ email, name, password: hashedPassword });
+    const user = await User.create({
+      email,
+      name,
+      password: hashedPassword,
+      avatar: avatarFilename ?? null,
+      coverPhoto: coverFilename ?? null,
+    });
 
     return {
       success: true,

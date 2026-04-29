@@ -8,11 +8,17 @@ import {
   googleCallbackController,
 } from "../../controller/auth/auth.controller";
 import { authMiddleware } from "../../middleware/authenticate.middleware";
+import { registerUpload } from "../../config/upload";
 
 export const authRouter = Router();
 
 // ── Public ────────────────────────────────────────────────────────────────────
-authRouter.post("/register", registerController);
+// Register accepts optional multipart fields: avatar, coverPhoto
+authRouter.post(
+  "/register",
+  registerUpload.fields([{ name: "avatar", maxCount: 1 }, { name: "coverPhoto", maxCount: 1 }]),
+  registerController
+);
 authRouter.post("/login", loginController);
 authRouter.post("/refresh", refreshController);
 

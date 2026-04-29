@@ -6,6 +6,7 @@ import { watchLaterRouter } from "../watchlater/routes";
 import { watchHistoryRouter } from "../watchhistory/routes";
 import { channelsRouter } from "../channels/routes";
 import { liveRouter } from "../live/routes";
+import { profileRouter } from "../profile/routes";
 import { authMiddleware } from "../../middleware/authenticate.middleware";
 
 export const router = Router();
@@ -21,3 +22,4 @@ router.use("/watch-later", watchLaterRouter);
 router.use("/watch-history", watchHistoryRouter);
 router.use("/channels", channelsRouter);
 router.use("/live", liveRouter);
+router.use("/profile", profileRouter);

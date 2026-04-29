@@ -37,6 +37,9 @@ app.use("/hls-output", express.static(path.join(process.cwd(), "hls-output")));
 // ─── Serve live HLS segments produced by Node Media Server ────────────────────
 app.use("/live-hls", express.static(path.join(process.cwd(), "live-hls")));
 
+// ─── Serve user-uploaded profile images and cover photos ──────────────────────
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 app.use("/health", (req: Request, res: Response) => {
   res.status(200).json({ message: "OK" });
 });
