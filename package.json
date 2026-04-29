@@ -8,7 +8,7 @@
     "build": "tsc && echo 'TypeScript compilation complete!' && npm run install-dependency-prod",
     "clean": "npx rimraf build",
     "rebuild": "npm run clean && npm run build",
-    "start": "nodemon build/index.js",
+    "start": "node build/index.js",
     "dev": "tsx index.ts",
     "lint": "eslint --ext .ts --fix .",
     "prettier": "prettier --write --ignore-unknown .",
